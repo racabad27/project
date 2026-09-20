@@ -93,4 +93,21 @@ Configured source= data/source
 
 - Task C (8.4) = This was more carefully done, after learning from the previous tasks mistakes. The code was first structured into a functioning/workable state, where I asked assistance from ``"Gemini"`` AI to help refine and possible troubleshoot the code, if any issues or inefficiencies lie. It came back as positive, not reporting any issues, suggesting that the code was alright to be run via vscode terminal using "python -c "from src.extract.files import extract_sources; from src.transform.staging import stage_all; from src.transform.curated import curate_all; extract_sources('test_001'); stage_all('test_001'); print(curate_all('test_001'))". 
 
+- Task D (8.5) = 
+## Pipeline Execution and Orchestration
+
+The pipeline is managed through a central command-line interface entrypoint located at `src/cli.py`. This script provides a modular execution interface that allows running individual pipeline phases independently or orchestrating the complete end-to-end flow in sequence. Every execution generates a unique, timestamped `run_id` to ensure isolated, reproducible runs and maintain audit lineage across all data layers.
+
+### Purpose that it serves
+
+- **Environment Validation (`validate-env`):** Inspects the active environment configuration, printing the project root path, database target details, and configured source data directory. Run this command first to verify settings before executing data operations.
+- **Raw Extraction (`extract`):** Reads source datasets from the configured input directory and creates an immutable raw snapshot partitioned under `data/raw/run_id=<run_id>/`.
+- **Data Transformation (`transform`):** Runs both staging and curated processing layers in sequence. The staging layer cleans fields, enforces schemas, deduplicates records, and routes invalid rows to quarantine. The curated layer joins staged entities, computes financial metrics (`gross_amount`, `discount_amount`, `net_amount`), generates record hashes, and flags orphan records.
+- **End-to-End Execution (`run-all`):** Orchestrates the full ETL workflow (`extract` followed by `transform`), executing the pipeline end-to-end within a single execution context.
+
+### Execution Examples
+Through this we will be able to proceed with the following commands needed in (8.6)
+- python -m src.cli run-all
+- python -m src.cli load
+- python -m src.cli load
 
