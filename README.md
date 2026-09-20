@@ -40,5 +40,33 @@ Additonal findings:
 Task B - Inspection came out complete: All SRC components are where they need to be and function how they are supposed to be.
 Task D - With a bit of back tracking, I found out that forgetting to remove the semi-colon next to the POSTGRE_PASSWORD had a resulting effect that gave me an error on this task. Requiring me to back-track to task C and make those necessary changes.Within the three fields "config.py, airflow.yml, and docker compose.yml",specifically in the Password section.
 
+``Inspection of PostgreSQL Initilization:``
+ Name   |       Owner       
+---------+-------------------
+ audit   | dss150p
+ curated | dss150p
+ public  | pg_database_owner
+ staging | dss150p
+(4 rows) 
+
+ Schema  |       Name        | Type  |  Owner  
+---------+-------------------+-------+---------
+ curated | sales_order_lines | table | dss150p
+(1 row)
+
+Task E 
+- Environment output = (Retrieved using:python -m src.cli validate-env)
+PROJECT_ROOT= C:\repovscode\dss150p-lab03-starter-main
+DB host/database= localhost dss150p
+Configured source= data/source  
+- Docker/Compose status = (healthy)
+- Git log = Output:
+b762b31 (HEAD -> goal1-reproducible-environment, origin/main, main) Small changes to Task C, noted in the READme and Finished Task D
+83772aa Forgot to include the Case for inspection in task B status in readme
+6abab64 TASK C succesfully removed all fields revealing password
+1edd47d Created .env with gitignore, including .env.example
+21554ef Testing commit
+- Explanation: I personally believe that configuration should be kept seperate from code because it contains sensitive information that need to be kept secret and private, hence why we have exclusions like the ones placed in gitignore.
+
 
 
