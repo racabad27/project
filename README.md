@@ -33,3 +33,10 @@ docker compose -f docker-compose.yml -f docker-compose.airflow.yml up airflow-in
 docker compose -f docker-compose.yml -f docker-compose.airflow.yml up -d airflow-webserver airflow-scheduler
 ```
 Airflow UI: http://localhost:8080 (training credentials: admin/admin; change if reused outside the lab).
+
+
+Additonal findings: 
+
+Task B - Inspection came out complete: All SRC components are where they need to be and function how they are supposed to be.
+
+
