@@ -86,7 +86,10 @@ Configured source= data/source
 - Code is divided into modules with clear responsibilities = Accomplished
 
 ## Goal 2 
-- TASK B (8.2) = Syntax construction was able to produce the required snapshots, with respect to 8.1 requirements. Running the whole line within the command line "python -c "from src.extract.files import extract_sources; print(extract_sources('test_001'))" To confirm it returning the needed snapshots and creating the folder in data. 
+- TASK A (8.2) = Syntax construction was able to produce the required snapshots, with respect to 8.1 requirements. Running the whole line within the command line "python -c "from src.extract.files import extract_sources; print(extract_sources('test_001'))" To confirm it returning the needed snapshots and creating the folder in data. 
 ``Note for 8.2 - The bulk of the syntax construction was gotten from built-in intellicence, while the refinement was done with the help of AI (Gemini). To help ensure functionality and accuracy of paths of the code.``
+
+- Task B (8.3) = There were some initial problems that were presented upon initially running **"python -c "from src.extract.files import extract_sources; from src.transform.staging import stage_all; extract_sources('test_001'); print(stage_all('test_001'))"**. This was carefully inspected and troubleshooted using ``Gemini AI``. There was an initial debugging stage, first running a syntax that displays the column names of each file (customer.csv,orders.csv,products.json). It was revealed that "name" was not found in the the original customers.csv. Another was order_date was looked for instead of order_timestamp. Lastly, price in products.parquet was attempted to be located when it should have been unit_price. All-in-all, the bug was more on naming issues for specific columns. The second run fixed all these issues and successfully accomplished the task.
+- 
 
 
