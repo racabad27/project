@@ -38,5 +38,7 @@ Airflow UI: http://localhost:8080 (training credentials: admin/admin; change if 
 Additonal findings: 
 
 Task B - Inspection came out complete: All SRC components are where they need to be and function how they are supposed to be.
+Task D - With a bit of back tracking, I found out that forgetting to remove the semi-colon next to the POSTGRE_PASSWORD had a resulting effect that gave me an error on this task. Requiring me to back-track to task C and make those necessary changes.Within the three fields "config.py, airflow.yml, and docker compose.yml",specifically in the Password section.
+
 
 
