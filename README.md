@@ -35,7 +35,7 @@ docker compose -f docker-compose.yml -f docker-compose.airflow.yml up -d airflow
 Airflow UI: http://localhost:8080 (training credentials: admin/admin; change if reused outside the lab).
 
 
-Additonal findings: 
+## Additonal findings: 
 
 Task B - Inspection came out complete: All SRC components are where they need to be and function how they are supposed to be.
 Task D - With a bit of back tracking, I found out that forgetting to remove the semi-colon next to the POSTGRE_PASSWORD had a resulting effect that gave me an error on this task. Requiring me to back-track to task C and make those necessary changes.Within the three fields "config.py, airflow.yml, and docker compose.yml",specifically in the Password section.
@@ -90,6 +90,7 @@ Configured source= data/source
 ``Note for 8.2 - The bulk of the syntax construction was gotten from built-in intellicence, while the refinement was done with the help of AI (Gemini). To help ensure functionality and accuracy of paths of the code.``
 
 - Task B (8.3) = There were some initial problems that were presented upon initially running **"python -c "from src.extract.files import extract_sources; from src.transform.staging import stage_all; extract_sources('test_001'); print(stage_all('test_001'))"**. This was carefully inspected and troubleshooted using ``Gemini AI``. There was an initial debugging stage, first running a syntax that displays the column names of each file (customer.csv,orders.csv,products.json). It was revealed that "name" was not found in the the original customers.csv. Another was order_date was looked for instead of order_timestamp. Lastly, price in products.parquet was attempted to be located when it should have been unit_price. All-in-all, the bug was more on naming issues for specific columns. The second run fixed all these issues and successfully accomplished the task.
-- 
+
+- Task C (8.4) = This was more carefully done, after learning from the previous tasks mistakes. The code was first structured into a functioning/workable state, where I asked assistance from ``"Gemini"`` AI to help refine and possible troubleshoot the code, if any issues or inefficiencies lie. It came back as positive, not reporting any issues, suggesting that the code was alright to be run via vscode terminal using "python -c "from src.extract.files import extract_sources; from src.transform.staging import stage_all; from src.transform.curated import curate_all; extract_sources('test_001'); stage_all('test_001'); print(curate_all('test_001'))". 
 
 
