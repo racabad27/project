@@ -85,4 +85,8 @@ Configured source= data/source
 - .env is not tracked by Git. = Confirmed 
 - Code is divided into modules with clear responsibilities = Accomplished
 
+## Goal 2 
+- TASK B (8.2) = Syntax construction was able to produce the required snapshots, with respect to 8.1 requirements. Running the whole line within the command line "python -c "from src.extract.files import extract_sources; print(extract_sources('test_001'))" To confirm it returning the needed snapshots and creating the folder in data. 
+``Note for 8.2 - The bulk of the syntax construction was gotten from built-in intellicence, while the refinement was done with the help of AI (Gemini). To help ensure functionality and accuracy of paths of the code.``
+
 
