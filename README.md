@@ -68,5 +68,21 @@ b762b31 (HEAD -> goal1-reproducible-environment, origin/main, main) Small change
 21554ef Testing commit
 - Explanation: I personally believe that configuration should be kept seperate from code because it contains sensitive information that need to be kept secret and private, hence why we have exclusions like the ones placed in gitignore.
 
+``Goal 1 (7.6) Acceptance tests``
+- Fresh virtual environment installs from requirements.txt. = Works as intended with no error, given that I am currently using python (3.12.10). However, it was previously stated that (3.14) did give me problems due to early build issues.
+- python -m src.cli validate-env succeeds locally = works and prints PROJECT_ROOT, DB host/database, and Configured source.
+- docker compose run --rm pipeline python -m src.cli validate-env succeeds. = Responds successfully with output 
+  [+] run 1/1
+ ✔ Container dss150p-postgres Running                                                0.0s
+Container dss150p-postgres Waiting 
+Container dss150p-postgres Healthy 
+Container dss150p-lab03-starter-main-pipeline-run-19a5fb6e3644 Creating 
+Container dss150p-lab03-starter-main-pipeline-run-19a5fb6e3644 Created 
+PROJECT_ROOT= /app
+DB host/database= postgres dss150p
+Configured source= data/source
+- PostgreSQL starts healthy and contains the expected schemas. = Starts healthy and contains the schemas for curated and non-curated.
+- .env is not tracked by Git. = Confirmed 
+- Code is divided into modules with clear responsibilities = Accomplished
 
 
