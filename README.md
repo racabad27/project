@@ -149,3 +149,14 @@ Through this we will be able to proceed with the following commands needed in (8
 - Wired load-partition and validate_partition_pruning execution into the CLI benchmark dispatcher.
 - This allows for us to use the command line executions:
 **python -m src.cli benchmark** and **python -m src.cli load-partition --year 2026 --month 1**
+## GOAL 3 analysis questions
+- Which file format was smallest on your machine, and what encoding/compression characteristics help explain the result?
+= Smallest on my machine was reported as the Parquet (3938100 bytes). The characteristics it possesses is a columnar storage layour, which allows values of the same data type to be stored sequentially. This enables high-ratio dictionary encoding, run-length encoding (RLE), and Snappy block compression, outperforming the other files like CSV and JSON.
+- Which representation was fastest for full dataset reads? Does that imply it is best for every worklaod?
+= Fastest format goes to the Parquet, containing a median latency of around 0.22 seconds. I do not think it implies that Parquet is the best for every workload. It might be an ideal answer for OLAP, but the opposite can be said for OLTP's.
+- How did filtered retrieval differ between Parquet and PostgreSQL? What additional PostgreSQL design (such as index) could change the result?
+= Parquet filtering evaluated in-memory/pushdown predicares (status == 'Delivered) in 0.002s, whereas PostgreSQL executed full table scans via SQLAlchemy SQL queries in 0.009s. Added a hash index on the status column (CREATE INDEX idx_status ON curated.sales_order_lines(status);) or creating table partitions would eliminate sequential scans in PostgreSQL, allowing for fast index lookups and competitive retrieval speeds.
+- Why is JSON Lines generally more pipeline-friendly than one giant JSON array for append/stream-oriented processing?
+= JSON lines stores each JSON object on its own newline delimtier. This allows producers to continously append records without parsing or re-writing opening/closing array brackets ([and]). Consumers can stream and prcess the file record-by-record without loading the entire payload into RAM.
+- What happens if a partition key has extremely high cardinality or poor query locality?
+= High cardinality causes the creation of lots of tiny subdirectories and files. This significantly inflates file system overhead, degrades metadata traversal performance.
