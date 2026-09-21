@@ -160,3 +160,9 @@ Through this we will be able to proceed with the following commands needed in (8
 = JSON lines stores each JSON object on its own newline delimtier. This allows producers to continously append records without parsing or re-writing opening/closing array brackets ([and]). Consumers can stream and prcess the file record-by-record without loading the entire payload into RAM.
 - What happens if a partition key has extremely high cardinality or poor query locality?
 = High cardinality causes the creation of lots of tiny subdirectories and files. This significantly inflates file system overhead, degrades metadata traversal performance.
+## 9.6 Goal 3 Acceptance tests 
+- CSV, JSONL, and Parquet all represent the exact same 33,363 validated records.
+- Benchmark runs across 5 iterations and reports median values for read latencies.
+- Physical storage sizes were accurately captured (Parquet: 3.94MB, DB: 9.19MB, CSV: 11.49MB, JSONL: 22.08MB) without treating size alone as the sole indicator of quality.
+- Output directory data/partitioned/ is organized strictly by order_year and order_month
+- Successfully tested via python -m src.cli load-partition --year 2026 --month 1, confirming record processing into PostgreSQL alongside logging in audit.partition_loads.
