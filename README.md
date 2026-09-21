@@ -137,4 +137,15 @@ Through this we will be able to proceed with the following commands needed in (8
 - Task (9.1) A and Task (9.2) B
 - The curated dataset ``(curated.sales_order_lines)`` contained 33,363 records that was made into four storage formats (Parquet,PostgreSQL,CSV,JSON)
 ![Table for 9.1 and 9.2 results](image.png)
-- In summary, Parquet was the most efficient due to columnar storage and block compression. While JSON was the the least efficient among all of them due to reapting key and column nam estrings on every record object.
+- In summary, Parquet was the most efficient due to columnar storage and block compression. While JSON was the the least efficient among all of them due to reapting key and column name strings on every record object.
+`` Ran using command python -m src.cli benchmark``
+- Task 9.3 C
+- Partionining enables query engines and data tools (such as PyArrow or Spark) to bypass scanning irrelevant year/month subdirectories during during date-range filters, drastically reducing I/O footprints for targeted analytical queries. The data was placed in the data/partitioned location in the repo. 
+- Task 9.4 D 
+- Added validate_partition_pruning in src/benchmark/storage.py
+- Added a validation function that reads the hive-partitioned directory(data/partitioned/)using PyArrow filters (orders_year == 2024 and order_month == 1) and asserts that row counts are correctly reduced.
+- Fixed engine configuration and database schema in src/load/postgres.py
+- resolved Database error (psycopg2.errors.UndefinedColumn) by dropping the existing audit.parititon_loads table and aligning column names (year,month) across SQL creation and insertion queries.
+- Wired load-partition and validate_partition_pruning execution into the CLI benchmark dispatcher.
+- This allows for us to use the command line executions:
+**python -m src.cli benchmark** and **python -m src.cli load-partition --year 2026 --month 1**

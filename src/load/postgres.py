@@ -95,8 +95,8 @@ def load_partition(df: pd.DataFrame, year: int, month: int, run_id: str) -> int:
             CREATE TABLE IF NOT EXISTS audit.partition_loads (
                 load_id SERIAL PRIMARY KEY,
                 pipeline_run_id VARCHAR(255),
-                target_year INT,
-                target_month INT,
+                year INT,
+                month INT,
                 rows_loaded INT,
                 loaded_at_utc TIMESTAMP WITH TIME ZONE
             );
@@ -104,7 +104,7 @@ def load_partition(df: pd.DataFrame, year: int, month: int, run_id: str) -> int:
 
         audit_sql = text("""
             INSERT INTO audit.partition_loads (
-                pipeline_run_id, target_year, target_month, rows_loaded, loaded_at_utc
+                pipeline_run_id, year, month, rows_loaded, loaded_at_utc
             ) VALUES (
                 :run_id, :year, :month, :rows_loaded, :loaded_at_utc
             );
