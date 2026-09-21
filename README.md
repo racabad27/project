@@ -211,3 +211,28 @@ The reason why I said the whole thing is safe is because each CLI task is desgin
 - Recovery succeeds without manual database cleanup or duplicate business rows was done through reverting the unrecognized csv back to its original state, effectively erasing the failure run.
 - DAG code delegates actual pipeline logic to resuable modules/CLI which was covered by implementing ``BashOperator`` to execute ``python -m src.cli`` commands.
 - One pipeline_run_id is propagated consistently across tasks in the same DAG run, which passed using the run_id of Airflow.
+
+## Task 11 Integrated Technical Acceptance test
+
+- Showed promise at first but there was an issue in audit.sql, that was addressed with the help of ``Gemini AI`` for fixing it. Now, the commands work as intended and everything initializes properly from a clean slate approach. 
+
+Code for simulating a clean or documentated state ``(Constructed by Gemini)``
+
+``docker compose -f docker-compose.yml -f    docker-compose.airflow.yml down -v``
+
+``Remove-Item -Path "data/raw/*", "data/staging/*", "data/curated/*", "data/quarantine/*", "data/partitioned/*", "data/benchmarks/*" -Recurse -Force -ErrorAction SilentlyContinue``
+
+**Followed by** the provided command in the PDF:
+
+```# Goal 1 environment
+python -m src.cli validate-env
+docker compose up -d postgres
+# Goal 2 full pipeline
+python -m src.cli run-all
+python -m src.cli load
+python -m src.cli validate
+# Goal 3 benchmark and partition
+python -m src.cli benchmark --repeats 5
+python -m src.cli load-partition --year 2026 --month 1
+# Goal 4 Airflow
+docker compose -f docker-compose.yml -f docker-compose.airflow.yml up -d airflow-webserver airflow-scheduler```

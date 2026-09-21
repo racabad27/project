@@ -93,29 +93,30 @@ def load_partition(df: pd.DataFrame, year: int, month: int, run_id: str) -> int:
         conn.execute(text("CREATE SCHEMA IF NOT EXISTS audit;"))
         conn.execute(text("""
             CREATE TABLE IF NOT EXISTS audit.partition_loads (
-                load_id SERIAL PRIMARY KEY,
-                pipeline_run_id VARCHAR(255),
-                year INT,
-                month INT,
-                rows_loaded INT,
-                loaded_at_utc TIMESTAMP WITH TIME ZONE
+                partition_key TEXT PRIMARY KEY,
+                loaded_at_utc TIMESTAMPTZ NOT NULL,
+                row_count INTEGER NOT NULL,
+                pipeline_run_id TEXT NOT NULL
             );
         """))
 
         audit_sql = text("""
             INSERT INTO audit.partition_loads (
-                pipeline_run_id, year, month, rows_loaded, loaded_at_utc
+                partition_key, loaded_at_utc, row_count, pipeline_run_id
             ) VALUES (
-                :run_id, :year, :month, :rows_loaded, :loaded_at_utc
-            );
+                :partition_key, :loaded_at_utc, :row_count, :run_id
+            )
+            ON CONFLICT (partition_key) DO UPDATE SET
+                loaded_at_utc = EXCLUDED.loaded_at_utc,
+                row_count = EXCLUDED.row_count,
+                pipeline_run_id = EXCLUDED.pipeline_run_id;
         """)
 
         conn.execute(audit_sql, {
-            "run_id": run_id,
-            "year": year,
-            "month": month,
-            "rows_loaded": rows_loaded,
-            "loaded_at_utc": datetime.now(timezone.utc)
+            "partition_key": f"{year}-{month:02d}",
+            "loaded_at_utc": datetime.now(timezone.utc),
+            "row_count": rows_loaded,
+            "run_id": run_id
         })
 
     print(f"[Partition Load] Audited load of {rows_loaded} rows for partition {year}-{month:02d}.")
