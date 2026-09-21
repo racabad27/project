@@ -111,3 +111,28 @@ Through this we will be able to proceed with the following commands needed in (8
 - python -m src.cli load
 - python -m src.cli load
 
+- Task (8.6) E = This specific was done with a lot of trouble shooting and will be discussed in the form of bullets points, since essay form would be too long. 
+- Database access configuration using .env and config.py, ensuring that python can connect to the PostgreSQL container.
+- Constructed the UPSERT load, with the base code (upsert_curated) used to insert new rows and update the existing ones using order_id as the key.
+- Handled the column constraints by adding default values for required columns (status, source_updated_at,) to meet database constraints and prevent errors. 
+- Created load_partition() to filter data by year/month and log execution details in an audit table.
+- Updated cli.py to run load and load partition
+- Added another py file located in common ``validation.py`` to verify necessary fields row counts and financial formulas.
+- Idempotency tests = Running the pipeline came out after the second attempt and gave 0 duplicate records, keeping a total of 33,363 total rows matching distinct orders.
+
+## Goal 2 acceptance tests (8.7) -> An easier summary that was constructed with the use of LLM Gemini.
+``Raw snapshots are run-specific and source files remain unchanged.``
+- This was verified via the snapshot.py saves raw extracts under data/raw/run_id wihtout overwriting base source files.
+``Duplicate business keys are resolved deterministically using latest updated_at.``
+- Verified during deduplication in transformation where duplicate order records select the row with the lastest timestamp.
+``Invalid technical records and orphan references are quarantined with reasons.``
+- Verified by checks that would route the malformed rows or missing foreign keys inot a "quarantine" folder that shows the different error tags.
+``Curated amounts are calculated and audit columns are populated``
+- Verified in transformation where gross_amount, discount_amount, and net_amount are computed alongside metadata fields(pipeline_run_id, processed_at_utc, record_hash).
+``Validation detects duplicate/null business keys and invalid amounts/statuses.``
+- This was answered using the command (python-m src.cli validate) which runs assertions against missing keys, negative/mismatched financial amounts, and invalid status values.
+``Repeated load does not create duplicate order_id values.``
+- Using the command given, **SELECT COUNT(*) total, COUNT(DISTINCT order_id) distinct_orders**, it returned 33,363 total rows matching distinct orders, effectively yielding 0 duplicates in order_id values.
+
+  
+
