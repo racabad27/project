@@ -136,7 +136,7 @@ Through this we will be able to proceed with the following commands needed in (8
 
 - Task (9.1) A and Task (9.2) B
 - The curated dataset ``(curated.sales_order_lines)`` contained 33,363 records that was made into four storage formats (Parquet,PostgreSQL,CSV,JSON)
-![Table for 9.1 and 9.2 results](image.png)
+![Results](<Table results for 9.1 and 9.2.png>)
 - In summary, Parquet was the most efficient due to columnar storage and block compression. While JSON was the the least efficient among all of them due to reapting key and column name strings on every record object.
 `` Ran using command python -m src.cli benchmark``
 - Task 9.3 C
@@ -166,3 +166,21 @@ Through this we will be able to proceed with the following commands needed in (8
 - Physical storage sizes were accurately captured (Parquet: 3.94MB, DB: 9.19MB, CSV: 11.49MB, JSONL: 22.08MB) without treating size alone as the sole indicator of quality.
 - Output directory data/partitioned/ is organized strictly by order_year and order_month
 - Successfully tested via python -m src.cli load-partition --year 2026 --month 1, confirming record processing into PostgreSQL alongside logging in audit.partition_loads.
+- Task 10.1 to 10.4 
+Output from docker airflow commands:
+``docker compose -f docker-compose.yml -f docker-compose.airflow.yml up airflow-init``
+``docker compose -f docker-compose.yml -f docker-compose.airflow.yml up -d airflow-webserver airflow-scheduler``
+``docker compose -f docker-compose.yml -f docker-compose.airflow.yml ps``
+
+= NAME                        IMAGE                                          COMMAND                  SERVICE             CREATED          STATUS                             PORTS
+dss150p-airflow-scheduler   dss150p-lab03-starter-main-airflow-scheduler   "/usr/bin/dumb-init …"   airflow-scheduler   14 seconds ago   Up 13 seconds                      8080/tcp
+dss150p-airflow-webserver   dss150p-lab03-starter-main-airflow-webserver   "/usr/bin/dumb-init …"   airflow-webserver   14 seconds ago   Up 14 seconds (health: starting)   0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp
+dss150p-postgres            postgres:16                                    "docker-entrypoint.s…"   postgres            18 hours ago     Up 4 hours (healthy)               0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp
+
+``Manual full run``
+![evidence showing all four tasks and their dependencies.](<Inspect in Grid view (4 success).png>)
+
+``Verifying audit.partition_loads afterward.`` 
+**Ran using python -c "from src.load.postgres import get_db_engine; from sqlalchemy import text; engine = get_db_engine(); conn = engine.connect(); result = conn.execute(text('SELECT * FROM audit.partition_loads ORDER BY load_id DESC LIMIT 1;')); print(result.fetchall())"**
+
+= [(1, 'run_20260921T103634Z_cc21d079', 2026, 1, 0, datetime.datetime(2026, 9, 21, 10, 36, 35, 50174, tzinfo=datetime.timezone.utc))]
