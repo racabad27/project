@@ -197,3 +197,17 @@ Output:
 - load = safe to rerun
 - validate = safe to rerun
 The reason why I said the whole thing is safe is because each CLI task is desgined to be indempotent and recieves the same run_id upon retry, clearing a failed task like extract allows airflow to re-execute the pipeline safely from the point of failure without duplicate rows or corrupting the database state.
+
+## Optional Challenge : Backfill reasoning
+- Data interval = Using a custom partition input such as ``(year and month)``.
+- Idempotency = Cleaning or overwriting existing target month data prior to insertion so re-running produces the exact same state without duplicate rows.
+- Avoiding double loads = Setting `catchup=False`  and `max_active_runs=1`  so historical runs execute sequentially and don't intertwine with live daily runs.
+
+## Task 10.7 Goal 4 acceptance tests
+- Airflow imports the DAG without parse errors. Verified as proof of earlier with all runs succeeding, prior to the intentional failure set-up.
+- DAG has explicit schedule, parameters, dependencies, retries, timeout, and catchup behavior. Verified, otherwise the DAG would not run as intended.
+- Full and partition-mode runs can be observed in Airflow: Verified via manual full execution and parameterized partition execution were done as instructed as part of compliance for part 10.3 and 10.4 with no issues.
+- Controlled failure produces visibile retires/failure handling when attempting to rename a csv from original to a unrecognized name.
+- Recovery succeeds without manual database cleanup or duplicate business rows was done through reverting the unrecognized csv back to its original state, effectively erasing the failure run.
+- DAG code delegates actual pipeline logic to resuable modules/CLI which was covered by implementing ``BashOperator`` to execute ``python -m src.cli`` commands.
+- One pipeline_run_id is propagated consistently across tasks in the same DAG run, which passed using the run_id of Airflow.
