@@ -10,6 +10,7 @@ from src.common.validation import run_validations
 from src.config import DB, PROJECT_ROOT, SETTINGS, path_for
 from src.extract.files import extract_sources
 from src.load.postgres import load_partition, upsert_curated
+from src.benchmark.storage import run_benchmark, write_partitioned_parquet
 from src.transform.curated import curate_all
 from src.transform.staging import stage_all
 
@@ -35,7 +36,6 @@ def run_transform(run_id: str) -> Path:
 def run_load(run_id: str) -> int:
     print(f"[Load] Upserting curated data into PostgreSQL (run_id={run_id})...")
     
-    # Check for active run path or fall back to the latest generated run
     curated_path = path_for("curated_dir") / f"run_id={run_id}" / "curated_sales.parquet"
     if not curated_path.exists():
         curated_dirs = sorted(path_for("curated_dir").glob("run_id=*"))
@@ -82,14 +82,12 @@ def main():
     sub.add_parser("run-all")
     args = parser.parse_args()
 
-    # Environment inspection
     if args.command == "validate-env":
         print("PROJECT_ROOT=", PROJECT_ROOT)
         print("DB host/database=", DB["host"], DB["dbname"])
         print("Configured source=", SETTINGS["pipeline"]["source_dir"])
         return
 
-    # Generate execution run_id for tracking
     run_id = new_run_id()
 
     if args.command == "extract":
@@ -118,15 +116,24 @@ def main():
         run_pipeline(run_id)
 
     elif args.command == "benchmark":
-        print(f"[Benchmark] Running pipeline benchmark ({args.repeats} repeats)...")
-        times = []
-        for i in range(args.repeats):
-            b_run_id = new_run_id()
-            t0 = time.time()
-            run_pipeline(b_run_id)
-            times.append(time.time() - t0)
-        avg_time = sum(times) / len(times)
-        print(f"\n[Benchmark Finished] Avg Execution Time: {avg_time:.3f}s over {args.repeats} runs.")
+        print(f"[Benchmark] Running Goal 3 storage benchmarks ({args.repeats} repeats)...")
+        curated_dirs = sorted(path_for("curated_dir").glob("run_id=*"))
+        if not curated_dirs:
+            print("[Benchmark Error] No curated dataset found. Run 'python -m src.cli transform' first.")
+            return
+
+        curated_path = curated_dirs[-1] / "curated_sales.parquet"
+        
+        # Determine target folders from config
+        benchmark_dir = str(path_for("benchmark_dir")) if "benchmark_dir" in SETTINGS["pipeline"] else "data/benchmarks"
+        partition_dir = str(path_for("partition_dir")) if "partition_dir" in SETTINGS["pipeline"] else "data/partitioned"
+
+        # Tasks 9.1 & 9.2: Materialization and read benchmarking
+        run_benchmark(curated_path=str(curated_path), output_dir=benchmark_dir, repeats=args.repeats)
+
+        # Task 9.3: Partitioning
+        df = pd.read_parquet(curated_path)
+        write_partitioned_parquet(df, partition_dir=partition_dir)
 
     else:
         raise NotImplementedError(f"Wire command: {args.command}")

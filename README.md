@@ -134,5 +134,7 @@ Through this we will be able to proceed with the following commands needed in (8
 ``Repeated load does not create duplicate order_id values.``
 - Using the command given, **SELECT COUNT(*) total, COUNT(DISTINCT order_id) distinct_orders**, it returned 33,363 total rows matching distinct orders, effectively yielding 0 duplicates in order_id values.
 
-  
-
+- Task (9.1) A
+- The curated dataset ``(curated.sales_order_lines)`` contained 33,363 records that was made into four storage formats (Parquet,PostgreSQL,CSV,JSON)
+![Table for 9.1 results](image.png)
+- In summary, Parquet was the most efficient due to columnar storage and block compression. While JSON was the the least efficient among all of them due to reapting key and column nam estrings on every record object.
