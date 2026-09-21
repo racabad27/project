@@ -184,3 +184,16 @@ dss150p-postgres            postgres:16                                    "dock
 **Ran using python -c "from src.load.postgres import get_db_engine; from sqlalchemy import text; engine = get_db_engine(); conn = engine.connect(); result = conn.execute(text('SELECT * FROM audit.partition_loads ORDER BY load_id DESC LIMIT 1;')); print(result.fetchall())"**
 
 = [(1, 'run_20260921T103634Z_cc21d079', 2026, 1, 0, datetime.datetime(2026, 9, 21, 10, 36, 35, 50174, tzinfo=datetime.timezone.utc))]
+- Task 10.5 (Failure checking)
+Using ``Rename-Item -Path "data/source/orders.csv" -NewName "orders_backup.csv"``
+Output:
+![Failed at extract](DAG(Rename-Failure-Trigger).png)
+
+- Using ``Rename-Item -Path "data/source/orders_backup.csv" -NewName "orders.csv"`` to revert back to original name for working run this time.
+![Success after renaming to original recognized csv](<(Reverting rename back to original).png>)
+**Explanation**
+- Extract = safe to rerun 
+- Transform = Safe to rerun 
+- load = safe to rerun
+- validate = safe to rerun
+The reason why I said the whole thing is safe is because each CLI task is desgined to be indempotent and recieves the same run_id upon retry, clearing a failed task like extract allows airflow to re-execute the pipeline safely from the point of failure without duplicate rows or corrupting the database state.
