@@ -1,1 +1,5 @@
 storage_type,file_size_bytes,write_seconds,full_read_seconds,filtered_read_seconds,row_count,notes
+CSV,11492386,0.455062,0.104981,0.001089,33363,Row-oriented text; universal compatibility but largest write overhead and no compression
+JSON Lines,22075404,0.383619,0.347168,0.002135,33363,Largest file; slowest full read due to per-row JSON parsing overhead
+Parquet,3938100,0.057308,0.021817,0.002393,33363,Columnar + Snappy compression; smallest file and fastest full read — best for analytical workloads
+PostgreSQL,9191424,,0.226348,0.008650,33363,Table size via pg_total_relation_size; write time N/A (loaded via pipeline UPSERT)
